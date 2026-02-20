@@ -57,10 +57,8 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const ip =
-        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
         req.socket.remoteAddress ||
         "unknown";
-
     if (isRateLimited(ip)) {
         return res
             .status(429)
