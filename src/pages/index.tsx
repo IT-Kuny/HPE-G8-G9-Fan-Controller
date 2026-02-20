@@ -12,7 +12,7 @@ import { fetchFans } from "../lib/iloClient";
 import { withSessionSsr } from "../lib/session";
 
 interface Props {
-    fans: FanObject[];
+    fans?: FanObject[];
     fail?: boolean;
 }
 
@@ -49,7 +49,7 @@ const Home = ({ fans, fail }: Props): JSX.Element => {
         );
 
     const initialFanSpeeds = useMemo(
-        () => fans.map((fan) => fan.CurrentReading),
+        () => (fans ?? []).map((fan) => fan.CurrentReading),
         [fans]
     );
 
@@ -65,8 +65,18 @@ const Home = ({ fans, fail }: Props): JSX.Element => {
     }, [initialFanSpeeds]);
 
     const handleLogout = async () => {
-        await fetch("/api/auth/logout", { method: "POST" });
-        router.push("/login");
+        try {
+            const response = await fetch("/api/auth/logout", { method: "POST" });
+            if (response.ok) {
+                router.push("/login");
+            } else {
+                console.error("Logout failed with status:", response.status);
+                toast.error("Failed to log out. Please try again.");
+            }
+        } catch (error) {
+            console.error("Logout request failed:", error);
+            toast.error("An error occurred while logging out. Please try again.");
+        }
     };
 
     const handleUnlock = async () => {
@@ -92,7 +102,7 @@ const Home = ({ fans, fail }: Props): JSX.Element => {
         preset: 1 | 2 | 3
     ) => {
         setPresetLoading(preset);
-        const speeds = fans.map(() => speed);
+        const speeds = (fans ?? []).map(() => speed);
 
         const response = await fetch(`/api/fans`, {
             method: "POST",
@@ -225,7 +235,7 @@ const Home = ({ fans, fail }: Props): JSX.Element => {
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap justify-center">
-                                    {fans.map((fan, index) => (
+                                    {(fans ?? []).map((fan, index) => (
                                         <div
                                             className={`${
                                                 index !==

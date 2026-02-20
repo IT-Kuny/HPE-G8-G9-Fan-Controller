@@ -10,20 +10,22 @@
 
 ## How this works
 
--   When you first load the page, a function runs through the [Next.js](https://nextjs.org/) `getServerSideProps` function which fetches the current data about the fan speeds of the server. This is then parsed and displayed on form, allowing you to have even 20 fans if you want as its all dynmaically parsed.
+-   When you first load the page, a function runs through the [Next.js](https://nextjs.org/) `getServerSideProps` function which fetches the current data about the fan speeds of the server. This is then parsed and displayed on a form, allowing you to have even 20 fans if you want as it's all dynamically parsed.
 
 -   Once you either apply the settings, or select a preset, the server connects via SSH to iLO4 and then runs the required commands, normally it takes about 10-20 seconds for all the commands to run through, but the more fans you have the longer it will take.
 
--   There's now an REST API available which you can use for scriptings and such
+-   There's a REST API available which you can use for scripting and automation.
 
 ## Important Information
 
--   There is **no authorization system** put in place, if you plan to expose this publicly, you must use some sort of authentication proxy such as [Authelia](https://github.com/authelia/authelia) which I have a guide for Kubernetes [here](https://github.com/DavidIlie/kubernetes-setup/tree/master/8%20-%20authelia). It wouldn't be fun for someone to put your server fans at 100% whilst you're not home.
+-   A **simple cookie-based login** protects the web UI and all API endpoints. Set `AUTH_USERNAME`, `AUTH_PASSWORD`, and `SESSION_SECRET` (≥ 32 characters) in your environment or `.env` file. Login is rate-limited (5 attempts per IP / 15 min). Note: rate limits are held in memory and reset on server restart; for multi-instance deployments behind a load balancer, add rate limiting at the reverse-proxy level or use a shared store such as Redis.
 
 ## REST API
 
-The controller now exposes a small REST API for automation or scripting:
+The controller now exposes a small REST API for automation or scripting. All endpoints require an authenticated session cookie — log in via the web UI or `POST /api/auth/login` first.
 
+-   `POST /api/auth/login` — authenticate with `{ "username": "...", "password": "..." }`.
+-   `POST /api/auth/logout` — destroy the current session.
 -   `GET /api/fans` — retrieves the current iLO fan data payload.
 -   `POST /api/fans` — sets fan speeds using a JSON body like `{ "fans": [32, 32, 32, 32, 32, 32, 32, 32] }` (values are percentages).
 -   `POST /api/fans/unlock` — unlocks global fan control.
@@ -34,21 +36,35 @@ Example usage with `curl`:
 BASE_URL="http://ilo-fan-controller-ip.local:3000"
 ```
 
+### - Log in (obtain session cookie)
+```bash
+curl -s -X POST "$BASE_URL/api/auth/login" \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"your_password"}' \
+  -c cookies.txt | jq .
+```
+
 ### - Unlock manual control
 ```bash
-curl -s -X POST "$BASE_URL/api/fans/unlock" | jq .
+curl -s -X POST "$BASE_URL/api/fans/unlock" -b cookies.txt | jq .
 ```
 
 ### - Set all three fans to 40%
 ```bash
 curl -s -X POST "$BASE_URL/api/fans" \
   -H 'Content-Type: application/json' \
-  -d '{"fans":[40,40,40]}' | jq .
+  -d '{"fans":[40,40,40]}' -b cookies.txt | jq .
 ```
 
 ### - Read back actual values
 ```bash
-curl -s "$BASE_URL/api/fans" | jq .
+curl -s "$BASE_URL/api/fans" -b cookies.txt | jq .
+```
+
+### - Log out
+```bash
+curl -s -X POST "$BASE_URL/api/auth/logout" -b cookies.txt | jq .
+rm cookies.txt
 ```
 
 ## Installation
@@ -57,19 +73,24 @@ curl -s "$BASE_URL/api/fans" | jq .
 
 ## Docker
 
-This repository contains a docker image which can easily be pulled down to use in a Docker/Kubernetes environment. Modify the command below with **your** values regarding your setup and then you can run the command:
+Clone the repository and build the Docker image, then run it with your configuration:
 
 ```bash
 git clone https://github.com/0n1cOn3/ilo4-fan-controller
+cd ilo4-fan-controller
 docker build -t local/ilo4-fan-controller:latest-local .
+```
 
 ```bash
 docker run -d \
   --name=ilo4-fan-controller \
   -p 3000:3000 \
   -e ILO_USERNAME='*your username*' \
-  -e ILO_PASSWORD='*your password**' \
+  -e ILO_PASSWORD='*your password*' \
   -e ILO_HOST='*the ip address you access ILO on*' \
+  -e AUTH_USERNAME='admin' \
+  -e AUTH_PASSWORD='*your strong login password*' \
+  -e SESSION_SECRET='*random string, at least 32 characters*' \
   --restart unless-stopped \
   local/ilo4-fan-controller:latest-local
 ```
@@ -81,9 +102,13 @@ You can modify this to work with Rancher, Portainer, etc.
 On your desired machine, clone down the repository and make a copy of the `.env.template` into `.env` and fill in **your** values.
 
 ```env
-ILO_HOST=x.x.x.x.x
-ILO_USERNAME=iasbdliyasiyasd
-ILO_PASSWORD=aosdubaiusldbaisdbiasd
+ILO_HOST=192.168.1.100
+ILO_USERNAME=your_ilo_username
+ILO_PASSWORD=your_ilo_password
+
+AUTH_USERNAME=admin
+AUTH_PASSWORD=your_strong_password_here
+SESSION_SECRET=random_string_at_least_32_characters_long
 ```
 
 Before you do anything you first need to build the project:
