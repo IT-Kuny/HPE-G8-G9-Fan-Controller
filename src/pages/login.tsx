@@ -39,7 +39,7 @@ const Login = (): JSX.Element => {
             <Fade direction="up" triggerOnce>
                 <div className="container w-full pt-6 pb-6 duration-150 bg-gray-900 border-2 border-gray-700 rounded shadow-xl sm:px-12 sm:max-w-md">
                     <div className="flex items-center justify-center gap-4 mb-6">
-                        <img src="/ilo-logo.png" />
+                        <img src="/ilo-logo.png" alt="iLO Logo" />
                         <h1 className="text-xl font-semibold">
                             iLO Fan Controller
                         </h1>

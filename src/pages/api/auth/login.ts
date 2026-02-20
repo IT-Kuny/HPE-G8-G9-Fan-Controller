@@ -1,5 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { timingSafeEqual } from "crypto";
 import { withSessionRoute } from "../../../lib/session";
+
+function safeCompare(a: string, b: string): boolean {
+    const bufA = Buffer.from(a);
+    const bufB = Buffer.from(b);
+    if (bufA.length !== bufB.length) {
+        timingSafeEqual(bufA, bufA);
+        return false;
+    }
+    return timingSafeEqual(bufA, bufB);
+}
 
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
@@ -10,8 +21,10 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     const { username, password } = req.body;
 
     if (
-        username === process.env.AUTH_USERNAME &&
-        password === process.env.AUTH_PASSWORD
+        typeof username === "string" &&
+        typeof password === "string" &&
+        safeCompare(username, process.env.AUTH_USERNAME) &&
+        safeCompare(password, process.env.AUTH_PASSWORD)
     ) {
         req.session.user = {
             username,
