@@ -22,11 +22,19 @@ async function logoutRoute(req: NextApiRequest, res: NextApiResponse) {
         }
     }
 
-    const protocol =
-        ((req.headers["x-forwarded-proto"] as string | undefined) ||
-            ((req.socket as { encrypted?: boolean }).encrypted ? "https" : "http"))
-            .split(",")[0]
-            .trim();
+    const forwardedProtoHeader = req.headers["x-forwarded-proto"];
+    let protocol: string;
+    if (typeof forwardedProtoHeader === "string" && forwardedProtoHeader.length > 0) {
+        protocol = forwardedProtoHeader.split(",")[0].trim();
+    } else {
+        const socket = req.socket as unknown;
+        const isEncrypted =
+            !!socket &&
+            typeof socket === "object" &&
+            "encrypted" in (socket as Record<string, unknown>) &&
+            (socket as Record<string, unknown>).encrypted === true;
+        protocol = isEncrypted ? "https" : "http";
+    }
     const host = req.headers.host;
     const expectedOrigin = host ? `${protocol}://${host}` : null;
 
