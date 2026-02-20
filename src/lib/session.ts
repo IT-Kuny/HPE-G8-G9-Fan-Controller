@@ -19,14 +19,20 @@ export const sessionOptions: IronSessionOptions = {
     },
 };
 
+const KNOWN_SESSION_SECRET_PLACEHOLDERS = [
+    "CHANGE_ME_generate_random_32_char_string",
+    "complex_password_at_least_32_characters_long",
+];
+
 if (
     !process.env.SESSION_SECRET ||
     process.env.SESSION_SECRET.length < 32 ||
+    KNOWN_SESSION_SECRET_PLACEHOLDERS.includes(process.env.SESSION_SECRET) ||
     !process.env.AUTH_USERNAME ||
     !process.env.AUTH_PASSWORD
 ) {
     throw new Error(
-        "Environment variables SESSION_SECRET (at least 32 characters long), AUTH_USERNAME, and AUTH_PASSWORD must all be set"
+        "Environment variables SESSION_SECRET (at least 32 characters long and not a placeholder value), AUTH_USERNAME, and AUTH_PASSWORD must all be set"
     );
 }
 
