@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { fetchFans } from "../../lib/iloClient";
-import { withAuth } from "../../lib/withAuth";
 
 export const getData = fetchFans;
 
@@ -15,4 +14,4 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     }
 };
 
-export default withAuth(handler);
+export default handler;

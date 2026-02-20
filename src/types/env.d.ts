@@ -3,8 +3,5 @@ declare namespace NodeJS {
         ILO_HOST: string;
         ILO_USERNAME: string;
         ILO_PASSWORD: string;
-        AUTH_USERNAME: string;
-        AUTH_PASSWORD: string;
-        SESSION_SECRET: string;
     }
 }

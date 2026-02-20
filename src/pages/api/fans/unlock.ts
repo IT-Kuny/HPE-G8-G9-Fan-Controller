@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { unlockFans } from "../../../lib/iloClient";
-import { withAuth } from "../../../lib/withAuth";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method !== "POST") {
@@ -18,4 +17,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 };
 
-export default withAuth(handler);
+export default handler;
