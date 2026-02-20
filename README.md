@@ -8,8 +8,6 @@
   <i>Professional fan speed management for HP ProLiant servers</i>
 </p>
 
-
-
 ---
 
 ## Overview
