@@ -14,6 +14,8 @@ import { createMocks } from "node-mocks-http";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { changeFanSpeedSchema } from "../../schemas/changeFanSpeed";
 
+const MISSING_ENV_ERROR = "Missing required environment variables: ILO_HOST, ILO_USERNAME, ILO_PASSWORD";
+
 // Mock iloClient for all API route tests
 jest.mock("../../lib/iloClient", () => ({
     fetchFans: jest.fn().mockResolvedValue([]),
@@ -215,7 +217,7 @@ describe("Security Tests", () => {
             // actually throws, the error is handled properly.
             const { fetchFans } = require("../../lib/iloClient");
             fetchFans.mockRejectedValueOnce(
-                new Error("Missing required environment variables: ILO_HOST, ILO_USERNAME, ILO_PASSWORD")
+                new Error(MISSING_ENV_ERROR)
             );
 
             const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: "GET" });
@@ -229,7 +231,7 @@ describe("Security Tests", () => {
         it("error message enumerates all missing variables", async () => {
             const { fetchFans } = require("../../lib/iloClient");
             fetchFans.mockRejectedValueOnce(
-                new Error("Missing required environment variables: ILO_HOST, ILO_USERNAME, ILO_PASSWORD")
+                new Error(MISSING_ENV_ERROR)
             );
 
             const { req, res } = createMocks<NextApiRequest, NextApiResponse>({ method: "GET" });
