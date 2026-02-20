@@ -263,7 +263,7 @@ describe("Security Tests", () => {
         it("POST /api/fans handles null body gracefully", async () => {
             const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
                 method: "POST",
-                body: null,
+                body: undefined,
             });
             await fansHandler(req, res);
 

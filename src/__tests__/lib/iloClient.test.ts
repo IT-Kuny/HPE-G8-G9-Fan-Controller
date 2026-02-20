@@ -22,9 +22,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    delete process.env.ILO_HOST;
-    delete process.env.ILO_USERNAME;
-    delete process.env.ILO_PASSWORD;
+    delete (process.env as any).ILO_HOST;
+    delete (process.env as any).ILO_USERNAME;
+    delete (process.env as any).ILO_PASSWORD;
 });
 
 // Require after mocks are set up to avoid module caching issues
@@ -81,19 +81,19 @@ describe("iloClient", () => {
         });
 
         it("throws when ILO_HOST is missing", async () => {
-            delete process.env.ILO_HOST;
+            delete (process.env as any).ILO_HOST;
             const { fetchFans } = getClient();
             await expect(fetchFans()).rejects.toThrow("Missing required environment variables");
         });
 
         it("throws when ILO_USERNAME is missing", async () => {
-            delete process.env.ILO_USERNAME;
+            delete (process.env as any).ILO_USERNAME;
             const { fetchFans } = getClient();
             await expect(fetchFans()).rejects.toThrow("Missing required environment variables");
         });
 
         it("throws when ILO_PASSWORD is missing", async () => {
-            delete process.env.ILO_PASSWORD;
+            delete (process.env as any).ILO_PASSWORD;
             const { fetchFans } = getClient();
             await expect(fetchFans()).rejects.toThrow("Missing required environment variables");
         });
@@ -139,7 +139,7 @@ describe("iloClient", () => {
         });
 
         it("throws when environment variables are missing", async () => {
-            delete process.env.ILO_HOST;
+            delete (process.env as any).ILO_HOST;
             const { unlockFans } = getClient();
             await expect(unlockFans()).rejects.toThrow("Missing required environment variables");
         });
