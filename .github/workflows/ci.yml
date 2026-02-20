@@ -1,11 +1,11 @@
-name: "Security Check (CI/CD) Pipeline"
+name: "Security Check, Build & Test"
 
 on:
   push:
     branches: [master, main]
   pull_request:
     branches: [master, main]
-  workflow_dispatch:  # ← Für manuellen Button!
+  workflow_dispatch:
 
 jobs:
   security:
