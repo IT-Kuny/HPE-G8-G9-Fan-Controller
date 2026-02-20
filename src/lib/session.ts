@@ -13,12 +13,20 @@ export const sessionOptions: IronSessionOptions = {
     cookieName: "ilo_fan_controller_session",
     cookieOptions: {
         secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24,
     },
 };
 
-if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+if (
+    !process.env.SESSION_SECRET ||
+    process.env.SESSION_SECRET.length < 32 ||
+    !process.env.AUTH_USERNAME ||
+    !process.env.AUTH_PASSWORD
+) {
     throw new Error(
-        "SESSION_SECRET environment variable must be set and at least 32 characters long"
+        "Environment variables SESSION_SECRET (at least 32 characters long), AUTH_USERNAME, and AUTH_PASSWORD must all be set"
     );
 }
 

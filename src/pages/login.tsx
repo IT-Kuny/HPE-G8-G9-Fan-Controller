@@ -24,8 +24,34 @@ const Login = (): JSX.Element => {
             if (response.ok) {
                 router.push("/");
             } else {
-                const data = await response.json();
-                toast.error(data.message || "Login failed");
+                let errorMessage = "Login failed";
+                const contentType = response.headers.get("content-type") || "";
+
+                if (contentType.includes("application/json")) {
+                    try {
+                        const data = await response.json();
+                        if (
+                            data &&
+                            typeof data.message === "string" &&
+                            data.message.trim()
+                        ) {
+                            errorMessage = data.message;
+                        }
+                    } catch {
+                        // Ignore JSON parsing errors and fall back to default message
+                    }
+                } else {
+                    try {
+                        const text = await response.text();
+                        if (text && text.trim()) {
+                            errorMessage = text;
+                        }
+                    } catch {
+                        // Ignore text parsing errors and fall back to default message
+                    }
+                }
+
+                toast.error(errorMessage);
             }
         } catch {
             toast.error("An error occurred");

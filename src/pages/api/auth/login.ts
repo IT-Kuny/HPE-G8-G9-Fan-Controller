@@ -12,10 +12,51 @@ function safeCompare(a: string, b: string): boolean {
     return timingSafeEqual(bufA, bufB);
 }
 
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+
+function isRateLimited(ip: string): boolean {
+    const now = Date.now();
+    const record = loginAttempts.get(ip);
+
+    if (!record || now > record.resetAt) {
+        return false;
+    }
+
+    return record.count >= MAX_ATTEMPTS;
+}
+
+function recordFailedAttempt(ip: string): void {
+    const now = Date.now();
+    const record = loginAttempts.get(ip);
+
+    if (!record || now > record.resetAt) {
+        loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    } else {
+        record.count++;
+    }
+}
+
+function clearAttempts(ip: string): void {
+    loginAttempts.delete(ip);
+}
+
 async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== "POST") {
         res.setHeader("Allow", ["POST"]);
         return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
+    const ip =
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+        req.socket.remoteAddress ||
+        "unknown";
+
+    if (isRateLimited(ip)) {
+        return res
+            .status(429)
+            .json({ message: "Too many login attempts. Please try again later." });
     }
 
     const { username, password } = req.body;
@@ -23,9 +64,12 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
     if (
         typeof username === "string" &&
         typeof password === "string" &&
+        username.length > 0 &&
+        password.length > 0 &&
         safeCompare(username, process.env.AUTH_USERNAME) &&
         safeCompare(password, process.env.AUTH_PASSWORD)
     ) {
+        clearAttempts(ip);
         req.session.user = {
             username,
             isLoggedIn: true,
@@ -34,6 +78,7 @@ async function loginRoute(req: NextApiRequest, res: NextApiResponse) {
         return res.status(200).json({ message: "ok" });
     }
 
+    recordFailedAttempt(ip);
     return res.status(401).json({ message: "Invalid credentials" });
 }
 
