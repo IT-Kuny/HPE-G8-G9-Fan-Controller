@@ -1,106 +1,106 @@
-# Another modded iLO4 Fan Controller for Gen 8 HP Servers
+# iLO4 Fan Controller for HP Gen8 Servers
+
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://github.com/IT-Kuny/ilo4-fan-controller/pkgs/container/ilo4-fan-controller)
 
 <p align="center">
-  <img width="400" src="readme/screenshot.png">
+  <img width="400" src="readme/screenshot.png" alt="iLO4 Fan Controller Interface">
   <br>
-  <i>Freely manage your HP's fan speeds; anywhere, any time!</i>
+  <i>Professional fan speed management for HP ProLiant servers</i>
 </p>
+
+
 
 ---
 
-## How this works
+## Overview
 
--   When you first load the page, a function runs through the [Next.js](https://nextjs.org/) `getServerSideProps` function which fetches the current data about the fan speeds of the server. This is then parsed and displayed on a form, allowing you to have even 20 fans if you want as it's all dynamically parsed.
+A modern web-based application for managing fan speeds on HP ProLiant Gen8 servers with modified iLO4 firmware. Provides both an intuitive web interface and comprehensive REST API for automation and scripting.
 
--   Once you either apply the settings, or select a preset, the server connects via SSH to iLO4 and then runs the required commands, normally it takes about 10-20 seconds for all the commands to run through, but the more fans you have the longer it will take.
+### Key Features
 
--   There's a REST API available which you can use for scripting and automation.
+- 🌐 **Web Interface**: Responsive design accessible from any device
+- 🔧 **Dynamic Configuration**: Auto-detects and supports variable fan counts
+- 🔒 **Secure Authentication**: Cookie-based sessions with rate limiting
+- 📡 **REST API**: Complete API for automation and integration
+- 🐳 **Container Ready**: Docker support with environment configuration
+- ⚡ **Real-time Updates**: Live fan status monitoring and control
 
-## Important Information
+#### [![Security Checks (CI/CD)](https://github.com/IT-Kuny/ilo4-fan-controller/actions/workflows/ci.yml/badge.svg)](https://github.com/IT-Kuny/ilo4-fan-controller/actions/workflows/ci.yml)
+---
 
--   A **simple cookie-based login** protects the web UI and all API endpoints. Set `AUTH_USERNAME`, `AUTH_PASSWORD`, and `SESSION_SECRET` (≥ 32 characters) in your environment or `.env` file. Login is rate-limited (5 attempts per IP / 15 min). Note: rate limits are held in memory and reset on server restart; for multi-instance deployments behind a load balancer, add rate limiting at the reverse-proxy level or use a shared store such as Redis.
+## Prerequisites
 
-## REST API
+⚠️ **Important**: This application requires HP iLO4 firmware modified with [**"The Fan Hack"**](https://www.reddit.com/r/homelab/comments/hix44v/silence_of_the_fans_pt_2_hp_ilo_4_273_now_with/) to enable SSH-based fan control.
 
-The controller now exposes a small REST API for automation or scripting. All endpoints require an authenticated session cookie — log in via the web UI or `POST /api/auth/login` first.
+**Supported Hardware:**
+- HP ProLiant Gen8 servers (DL360p, DL380p, etc.)
+- Modified iLO4 firmware with SSH access enabled
+- Network connectivity to iLO management interface
 
--   `POST /api/auth/login` — authenticate with `{ "username": "...", "password": "..." }`.
--   `POST /api/auth/logout` — destroy the current session.
--   `GET /api/fans` — retrieves the current iLO fan data payload.
--   `POST /api/fans` — sets fan speeds using a JSON body like `{ "fans": [32, 32, 32, 32, 32, 32, 32, 32] }` (values are percentages).
--   `POST /api/fans/unlock` — unlocks global fan control.
-
-Example usage with `curl`:
-
-```bash
-BASE_URL="http://ilo-fan-controller-ip.local:3000"
-```
-
-### - Log in (obtain session cookie)
-```bash
-curl -s -X POST "$BASE_URL/api/auth/login" \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"your_password"}' \
-  -c cookies.txt | jq .
-```
-
-### - Unlock manual control
-```bash
-curl -s -X POST "$BASE_URL/api/fans/unlock" -b cookies.txt | jq .
-```
-
-### - Set all three fans to 40%
-```bash
-curl -s -X POST "$BASE_URL/api/fans" \
-  -H 'Content-Type: application/json' \
-  -d '{"fans":[40,40,40]}' -b cookies.txt | jq .
-```
-
-### - Read back actual values
-```bash
-curl -s "$BASE_URL/api/fans" -b cookies.txt | jq .
-```
-
-### - Log out
-```bash
-curl -s -X POST "$BASE_URL/api/auth/logout" -b cookies.txt | jq .
-rm cookies.txt
-```
+---
 
 ## Installation
 
-> The main requirement is that your iLO4 firmware is flashed with the _["The Fan Hack"](https://www.reddit.com/r/homelab/comments/hix44v/silence_of_the_fans_pt_2_hp_ilo_4_273_now_with/)_ mod.
-
-## Docker
-
-Clone the repository and build the Docker image, then run it with your configuration:
+### 🐳 Docker Deployment (Recommended)
 
 ```bash
-git clone https://github.com/0n1cOn3/ilo4-fan-controller
+# Clone repository
+git clone https://github.com/IT-Kuny/ilo4-fan-controller.git
 cd ilo4-fan-controller
-docker build -t local/ilo4-fan-controller:latest-local .
+
+# Build image
+docker build -t ilo4-fan-controller .
+
+# Run container
+docker run -d \
+  --name=ilo4-fan-controller \
+  --restart=unless-stopped \
+  -p 3000:3000 \
+  -e ILO_HOST='192.168.1.100' \
+  -e ILO_USERNAME='your_ilo_username' \
+  -e ILO_PASSWORD='your_ilo_password' \
+  -e AUTH_USERNAME='admin' \
+  -e AUTH_PASSWORD='your_secure_password' \
+  -e SESSION_SECRET='your_32_char_secret_key_here' \
+  ilo4-fan-controller
 ```
+
+### 📦 Pre-built Container
 
 ```bash
 docker run -d \
   --name=ilo4-fan-controller \
+  --restart=unless-stopped \
   -p 3000:3000 \
-  -e ILO_USERNAME='*your username*' \
-  -e ILO_PASSWORD='*your password*' \
-  -e ILO_HOST='*the ip address you access ILO on*' \
+  -e ILO_HOST='192.168.1.100' \
+  -e ILO_USERNAME='your_ilo_username' \
+  -e ILO_PASSWORD='your_ilo_password' \
   -e AUTH_USERNAME='admin' \
-  -e AUTH_PASSWORD='*your strong login password*' \
-  -e SESSION_SECRET='*random string, at least 32 characters*' \
-  --restart unless-stopped \
-  local/ilo4-fan-controller:latest-local
+  -e AUTH_PASSWORD='your_secure_password' \
+  -e SESSION_SECRET='your_32_char_secret_key_here' \
+  ghcr.io/it-kuny/ilo4-fan-controller:latest
 ```
 
-You can modify this to work with Rancher, Portainer, etc.
+### 🔧 Native Installation
 
-## Directly with node
+```bash
+# Clone and setup
+git clone https://github.com/IT-Kuny/ilo4-fan-controller.git
+cd ilo4-fan-controller
 
-On your desired machine, clone down the repository and make a copy of the `.env.template` into `.env` and fill in **your** values.
+# Configure environment
+cp .env.template .env
+# Edit .env with your settings
 
+# Install dependencies and build
+yarn install
+yarn build
+
+# Start application
+yarn start
+```
+
+**Environment Configuration (.env):**
 ```env
 ILO_HOST=192.168.1.100
 ILO_USERNAME=your_ilo_username
@@ -111,24 +111,145 @@ AUTH_PASSWORD=your_strong_password_here
 SESSION_SECRET=random_string_at_least_32_characters_long
 ```
 
-Before you do anything you first need to build the project:
+---
 
-```shell
-# fetches the dependencies
-yarn
+## REST API
 
-# builds the nextjs project
-yarn build
+### Authentication
+
+All API endpoints require authentication via session cookies. Obtain a session by logging in through the web interface or using the login endpoint.
+
+**Base URL:** `http://your-server:3000/api`
+
+### Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | Authenticate and create session |
+| `POST` | `/auth/logout` | Destroy current session |
+| `GET` | `/fans` | Retrieve current fan status |
+| `POST` | `/fans` | Set fan speeds |
+| `POST` | `/fans/unlock` | Enable manual fan control |
+
+### Usage Examples
+
+```bash
+BASE_URL="http://your-server:3000"
+
+# Authenticate
+curl -X POST "$BASE_URL/api/auth/login" \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"your_password"}' \
+  -c cookies.txt
+
+# Unlock fan control
+curl -X POST "$BASE_URL/api/fans/unlock" \
+  -b cookies.txt
+
+# Set fan speeds (percentages)
+curl -X POST "$BASE_URL/api/fans" \
+  -H 'Content-Type: application/json' \
+  -d '{"fans":[35,35,35,35]}' \
+  -b cookies.txt
+
+# Get current status
+curl "$BASE_URL/api/fans" \
+  -b cookies.txt | jq .
+
+# Logout
+curl -X POST "$BASE_URL/api/auth/logout" \
+  -b cookies.txt
+
+# Cleanup
+rm cookies.txt
 ```
 
-You can then create a `systemd` service, use `pm2`, or just run it directly:
+---
 
-```shell
-yarn start
-```
+## Security & Configuration
 
-## The Idea
+### Authentication & Rate Limiting
 
-HP offers enterprise servers which are normally supposed to be in some sort of datacenter environment, where things such as fan speed are not really a concern. With this in mind, when old HPE servers are decommissioned and put on the used market, people like myself buy these servers to have them part of our _Home Datacenter_.
+- **Session Management**: Secure cookie-based authentication
+- **Rate Limiting**: 5 login attempts per IP address per 15 minutes
+- **Environment Variables**: All sensitive data configured via environment
 
-These servers can easily start sounding like an airplane is starting to take off at your house, so modified firmwares of the server's IPMI system (iLO4) have been created in order to manage the fan speeds via SSH, but when your power goes off and you need to change the fan speed from your phone, that's a whole different story. The main inspiration for this project was this post I found on [r/homelab](https://www.reddit.com/r/homelab/comments/rcel73/i_created_a_web_page_to_manage_the_fans_of_my/), but I decided to create my own so that I can make it as customizable as possible and not have it restricted to some models.
+### Production Deployment
+
+- Use strong, unique passwords for `AUTH_PASSWORD`
+- Generate cryptographically secure `SESSION_SECRET` (≥32 characters)
+- Consider deploying behind reverse proxy with TLS termination
+- For multi-instance deployments, implement shared session storage (Redis)
+
+---
+
+## Architecture
+
+### How It Works
+
+1. **Frontend**: Next.js application with server-side rendering
+2. **Backend**: API routes handling iLO4 SSH communication  
+3. **Dynamic Discovery**: Auto-detects available fans via iLO4 queries
+4. **Real-time Control**: Direct SSH commands for immediate fan response
+5. **State Management**: Session-based authentication with secure cookies
+
+### Performance Notes
+
+- Fan speed changes typically take 10-20 seconds to apply
+- Response time scales with number of fans configured
+- SSH connection pooling for optimal performance
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**Connection Refused**
+- Verify iLO4 network connectivity and SSH service status
+- Confirm modified firmware installation and SSH enablement
+
+**Authentication Failed**
+- Check iLO4 username/password in environment configuration
+- Verify SSH access works manually: `ssh user@ilo-ip`
+
+**Fan Control Not Working**
+- Ensure fan control is unlocked via `/api/fans/unlock`
+- Confirm iLO4 firmware modification supports fan speed control
+
+---
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+
+- Code follows existing style conventions
+- Tests pass: `yarn test`
+- Documentation is updated for new features
+- Security considerations are addressed
+
+---
+
+## Credits & License
+
+### Acknowledgments
+
+This project is derived from [DavidIlie's ilo4-fan-controller](https://github.com/DavidIlie/ilo4-fan-controller) with significant enhancements and modernizations. The fork was detached to incorporate critical improvements and maintain active development.
+
+### Key Improvements
+
+- ✅ **Enhanced Documentation**: Comprehensive setup and API guides
+- ✅ **Modern CI/CD**: Automated testing and container builds  
+- ✅ **Security Hardening**: Rate limiting and session management
+- ✅ **API Expansion**: Complete REST API with examples
+- ✅ **Production Ready**: Docker support and deployment guides
+- ✅ **Active Maintenance**: Ongoing security updates and improvements
+
+### License
+
+This project maintains the same license terms as the original work. See individual source files for specific licensing information.
+
+---
+
+<p align="center">
+  <strong>⚡ Built for the HomeLab Community ⚡</strong>
