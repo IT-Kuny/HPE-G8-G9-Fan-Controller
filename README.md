@@ -1,6 +1,6 @@
-# iLO4 Fan Controller for HP Gen8 Servers
+# iLO4 Fan Controller for HP Gen8/Gen9 Servers
 
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://github.com/IT-Kuny/ilo4-fan-controller/pkgs/container/ilo4-fan-controller)
+[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/pkgs/container/ilo4-fan-controller)
 
 <p align="center">
   <img width="400" src="readme/screenshot.png" alt="iLO4 Fan Controller Interface">
@@ -23,7 +23,7 @@ A modern web-based application for managing fan speeds on HP ProLiant Gen8 serve
 - 🐳 **Container Ready**: Docker support with environment configuration
 - ⚡ **Real-time Updates**: Live fan status monitoring and control
 
-#### [![Security Checks (CI/CD)](https://github.com/IT-Kuny/ilo4-fan-controller/actions/workflows/ci.yml/badge.svg)](https://github.com/IT-Kuny/ilo4-fan-controller/actions/workflows/ci.yml)
+#### [![Security Checks (CI/CD)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml/badge.svg)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml)
 ---
 
 ## Prerequisites
@@ -31,7 +31,7 @@ A modern web-based application for managing fan speeds on HP ProLiant Gen8 serve
 ⚠️ **Important**: This application requires HP iLO4 firmware modified with [**"The Fan Hack"**](https://www.reddit.com/r/homelab/comments/hix44v/silence_of_the_fans_pt_2_hp_ilo_4_273_now_with/) to enable SSH-based fan control.
 
 **Supported Hardware:**
-- HP ProLiant Gen8 servers (DL360p, DL380p, etc.)
+- HP ProLiant Gen8/Gen9 servers (DL360p, DL380p, etc.)
 - Modified iLO4 firmware with SSH access enabled
 - Network connectivity to iLO management interface
 
@@ -67,7 +67,7 @@ docker run -d \
 
 ```bash
 docker run -d \
-  --name=ilo4-fan-controller \
+  --name=HPE-G8-G9-Fan-Controller \
   --restart=unless-stopped \
   -p 3000:3000 \
   -e ILO_HOST='192.168.1.100' \
@@ -76,14 +76,14 @@ docker run -d \
   -e AUTH_USERNAME='admin' \
   -e AUTH_PASSWORD='your_secure_password' \
   -e SESSION_SECRET='your_32_char_secret_key_here' \
-  ghcr.io/it-kuny/ilo4-fan-controller:latest
+  ghcr.io/it-kuny/HPE-G8-G9-Fan-Controller:latest
 ```
 
 ### 🔧 Native Installation
 
 ```bash
 # Clone and setup
-git clone https://github.com/IT-Kuny/ilo4-fan-controller.git
+git clone https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller.git
 cd ilo4-fan-controller
 
 # Configure environment
