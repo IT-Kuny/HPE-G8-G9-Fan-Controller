@@ -43,7 +43,7 @@ A modern web-based application for managing fan speeds on HP ProLiant Gen8 serve
 
 ```bash
 # Clone repository
-git clone https://github.com/IT-Kuny/ilo4-fan-controller.git
+git clone https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller.git
 cd ilo4-fan-controller
 
 # Build image
@@ -51,7 +51,7 @@ docker build -t ilo4-fan-controller .
 
 # Run container
 docker run -d \
-  --name=ilo4-fan-controller \
+  --name=HPE-G8-G9-Fan-Controller \
   --restart=unless-stopped \
   -p 3000:3000 \
   -e ILO_HOST='192.168.1.100' \
@@ -60,7 +60,7 @@ docker run -d \
   -e AUTH_USERNAME='admin' \
   -e AUTH_PASSWORD='your_secure_password' \
   -e SESSION_SECRET='your_32_char_secret_key_here' \
-  ilo4-fan-controller
+  HPE-G8-G9-Fan-Controller
 ```
 
 ### 📦 Pre-built Container
