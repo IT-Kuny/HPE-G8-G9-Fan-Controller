@@ -7,7 +7,7 @@
 .yarnrc.yml
 node_modules
 coverage
-readme
+readme/
 *.md
 LICENSE
 jest.config.ts
