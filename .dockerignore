@@ -1,1 +1,15 @@
 .env
+.env.*
+.git
+.github
+.gitignore
+.yarn
+node_modules
+coverage
+readme/
+*.md
+LICENSE
+jest.config.ts
+tsconfig.tsbuildinfo
+tui.py
+requirements.txt
