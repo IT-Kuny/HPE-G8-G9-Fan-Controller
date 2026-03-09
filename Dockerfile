@@ -1,16 +1,16 @@
-FROM node:20-alpine AS deps
+FROM node:20.20.1-alpine3.23 AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 120000
+COPY package.json yarn.lock .yarnrc.yml ./
+RUN yarn install --frozen-lockfile --network-timeout 120000 --registry https://registry.npmjs.org
 
-FROM node:20-alpine AS builder
+FROM node:20.20.1-alpine3.23 AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 RUN yarn build
 
-FROM node:20-alpine AS runner
+FROM node:20.20.1-alpine3.23 AS runner
 WORKDIR /app
 
 ARG APP_ENV=production
