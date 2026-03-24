@@ -243,6 +243,7 @@ This project is derived from [DavidIlie's ilo4-fan-controller](https://github.co
 
 ### Key Improvements
 
+- ✅ **User Login Interface**: No more unsecured fan controls without additional effort 
 - ✅ **Enhanced Documentation**: Comprehensive setup and API guides
 - ✅ **Modern CI/CD**: Automated testing and container builds  
 - ✅ **Security Hardening**: Rate limiting and session management
