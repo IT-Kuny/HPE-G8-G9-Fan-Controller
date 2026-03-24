@@ -6,14 +6,14 @@
 </p>
 
 <p align="center">
-  <img width="400" src="readme/screenshot.png" alt="iLO4 Fan Controller Interface">
+  <img width="400" src="https://github.com/user-attachments/assets/76f2bd8b-d289-41f6-ab62-fa26565f34a1" alt="iLO4 Fan Controller Interface">
   <br>
 </p>
 
 <img width="1020" height="533" alt="image" src="https://github.com/user-attachments/assets/b2a79350-d1fd-4afa-a2d4-2f54aaac0615" />
 
 <p align="center">
-  <i>Professional fan speed management for HP ProLiant servers</i>
+  <b>Professional fan speed management for HP ProLiant servers</b>
 </p>
 
 ---
@@ -31,7 +31,6 @@ A modern web-based application for managing fan speeds on HP ProLiant Gen8 serve
 - 🐳 **Container Ready**: Docker support with environment configuration
 - ⚡ **Real-time Updates**: Live fan status monitoring and control
 
-#### [![Security Checks (CI/CD)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml/badge.svg)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml)
 ---
 
 ## Prerequisites
