@@ -1,6 +1,9 @@
-# iLO4 Fan Controller for HP Gen8/Gen9 Servers
+<h1 align="center">iLO4 Fan Controller for HP Gen8/Gen9 Servers</h1>
 
-[![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/pkgs/container/ilo4-fan-controller)
+<p align="center">
+  <a href="https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/pkgs/container/hpe-g8-g9-fan-controller"><img src="https://img.shields.io/badge/docker-ready-blue.svg" alt="Docker"></a>
+  <a href="https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml"><img src="https://github.com/IT-Kuny/HPE-G8-G9-Fan-Controller/actions/workflows/ci.yml/badge.svg" alt="Security Check, Build & Test"></a>
+</p>
 
 <p align="center">
   <img width="400" src="readme/screenshot.png" alt="iLO4 Fan Controller Interface">
