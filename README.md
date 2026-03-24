@@ -5,6 +5,11 @@
 <p align="center">
   <img width="400" src="readme/screenshot.png" alt="iLO4 Fan Controller Interface">
   <br>
+</p>
+
+<img width="1020" height="533" alt="image" src="https://github.com/user-attachments/assets/b2a79350-d1fd-4afa-a2d4-2f54aaac0615" />
+
+<p align="center">
   <i>Professional fan speed management for HP ProLiant servers</i>
 </p>
 
